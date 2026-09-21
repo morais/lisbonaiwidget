@@ -275,7 +275,7 @@ def build_card(segments, now, day_number, next_push):
         "producer": {"label": "Lisbon AI schedule", "icon": "calendar"},
         "deepLink": DEEP_LINK,
         "staleAfter": iso(next_push + timedelta(minutes=30)),
-        "priority": 10,
+        "priority": 10,  # ahead of the household cards while the conference runs
     }
 
     if current and current["kind"] == "talk":
@@ -294,6 +294,7 @@ def build_card(segments, now, day_number, next_push):
             "statusIcon": "waveform",
             "deadline": iso(current["end"]),
             "deepLink": detail.get("url", DEEP_LINK),
+            "staleAfter": iso(current["end"] + timedelta(minutes=45)),
             "briefing": {"sections": sections[:6]},
         })
         return card
@@ -312,6 +313,7 @@ def build_card(segments, now, day_number, next_push):
             "status": "paused",
             "icon": "cup.and.saucer",
             "deadline": iso(current["end"]),
+            "staleAfter": iso(current["end"] + timedelta(minutes=45)),
             "briefing": {"sections": sections or [{"id": "info", "text": "Nothing on stage right now."}]},
         })
         return card
@@ -422,6 +424,8 @@ def main():
     p.add_argument("--date", metavar="YYYY-MM-DD", help="hang the programme on this date (default: today)")
     p.add_argument("--watch", action="store_true", help="keep it honest: push at every change until the day ends")
     p.add_argument("--speed", type=float, default=1.0, help="with --watch, run the clock this many times faster (demo)")
+    p.add_argument("--poll", type=float, default=POLL, metavar="SECONDS",
+                   help="with --watch, how often to re-check the schedule")
     p.add_argument("--update", action="store_true",
                    help="push to the already-running activity instead of starting one "
                         "(a start on a live id restarts it, which the user sees)")
@@ -470,14 +474,15 @@ def main():
     last_key, last_push = key(current), now
     try:
         while True:
-            time.sleep(POLL)
+            time.sleep(args.poll)
             now = clock(time.monotonic() - began)
             if now >= segments[-1]["end"]:
                 break
             current, _ = where_are_we(segments, now)
-            if key(current) != last_key or (now - last_push).total_seconds() >= HEARTBEAT:
-                publish(env, args.day, day, segments, now, started=True,
-                        dry_run=args.dry_run, with_card=not args.no_card)
+            changed = key(current) != last_key
+            if changed or (now - last_push).total_seconds() >= HEARTBEAT:
+                publish(env, args.day, day, segments, now, started=True, dry_run=args.dry_run,
+                        with_card=changed and not args.no_card)
                 last_key, last_push = key(current), now
     except KeyboardInterrupt:
         print("\ninterrupted")
