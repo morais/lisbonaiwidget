@@ -1,0 +1,370 @@
+{
+  "source": "https://lisbonai.org/talks/",
+  "talks": [
+    {
+      "slug": "prince-canuma",
+      "speaker": "Prince Canuma",
+      "org": "Neywa Labs",
+      "track": "Models",
+      "title": "Inference Engineering: Frontier Open Models on the Hardware You Already Own",
+      "abstract": [
+        "Open models are everywhere. Running them well is still hard. This talk is about the engineering that happens after training: making a frontier model fast, memory-efficient, and usable on the hardware you already have. Apple Silicon is the case study — unified memory, no discrete GPU, and a hard ceiling that makes every optimization count.",
+        "We'll cover the three levers that matter most on memory-bound hardware: quantization (weights and KV cache, with custom Metal kernels), token eviction for long context, and speculative decoding — with real benchmarks across Gemma and Qwen models, including where it works, where it doesn't, and why. We'll finish with multimodal inference and the parts of the pipeline most teams forget to profile. You'll leave with a clear mental model of the inference stack and a checklist of what to measure before you ship."
+      ],
+      "url": "https://lisbonai.org/talks/#prince-canuma"
+    },
+    {
+      "slug": "joan-rodriguez",
+      "speaker": "Joan Rodriguez",
+      "org": "QuiverAI",
+      "track": "Models",
+      "title": "Design as visual code",
+      "abstract": [
+        "AI can generate beautiful images. But design is more than an image: it has structure and intent. At QuiverAI, we train models to generate design as visual code, SVGs that can be rendered, inspected, and edited. This talk follows our path from early research in SVG code generation to production models: why we chose code over pixels, why scale alone was not enough, and how rendering feedback let the model learn from the visual consequences of its own code. An output can look right and still fail as a design asset. That gap defines the frontier of AI for design."
+      ],
+      "url": "https://lisbonai.org/talks/#joan-rodriguez"
+    },
+    {
+      "slug": "chema-garabito",
+      "speaker": "Chema Garabito",
+      "org": "Sperid Labs",
+      "track": "Models",
+      "title": "Spatial AI and 3D World Models",
+      "abstract": [
+        "We will explore Spatial AI and 3D World Models: systems that move beyond generating pixels to building coherent, persistent, and queryable representations of the physical world. We will cover the fundamental problem we aim to solve, the key technical challenges involved, and the applications this shift could unlock across robotics, simulation, media, gaming, and other real-world industries."
+      ],
+      "url": "https://lisbonai.org/talks/#chema-garabito"
+    },
+    {
+      "slug": "duarte-carmo",
+      "speaker": "Duarte Carmo",
+      "org": "Independent",
+      "track": "Models",
+      "title": "The Hitchhiker’s Guide to European Portuguese LLMs",
+      "abstract": [
+        "Large language models are eating the world. Frontier labs keep pushing the boundary, open-weights models are quickly closing the gap, Europe is — as always — stuck somewhere in the middle, and even Portugal has now released AMÁLIA, its own effort in the space.",
+        "But what does it actually take to build an LLM trained on European Portuguese data? Why would you? And where do you start when there is so little data? In this talk, I’ll walk through my work on European Portuguese LLMs: from building benchmarks, to finding and filtering data, to training models, and everything in between. We’ll probably leave with more questions than answers, but hopefully we’ll learn something along the way."
+      ],
+      "url": "https://lisbonai.org/talks/#duarte-carmo"
+    },
+    {
+      "slug": "sergio-paniego",
+      "speaker": "Sergio Paniego",
+      "org": "Hugging Face",
+      "track": "Models",
+      "title": "Training a coding agent through a harness you did not write",
+      "abstract": [
+        "An agent is a model plus a harness, and the harness is the part that calls the model, handles its tool calls and decides when to stop. Most of the ones doing real work were built by someone else, which makes them awkward to train, because the usual reinforcement learning setup assumes the trainer drives every step and here the harness already does.",
+        "This talk is a walkthrough of the other way round. We take an off-the-shelf open source coding agent, leave its code untouched, and run it in a sandbox with a proxy in front of the model, so every call it makes is recorded together with the token ids and logprobs the trainer needs. Those recordings become the training samples, the result of the task becomes the reward, and the async GRPO path in TRL updates the weights of the model the agent was calling. The environment side is OpenEnv, so the same setup takes any harness"
+      ],
+      "url": "https://lisbonai.org/talks/#sergio-paniego"
+    },
+    {
+      "slug": "bojan-jakimovski",
+      "speaker": "Bojan Jakimovski",
+      "org": "Loka",
+      "track": "Models",
+      "title": "Teaching an Open Model to do Science",
+      "abstract": [
+        "Can an open model learn to investigate biological evidence, use scientific tools, and produce structured reasoning? To find out, we at Loka teamed up with Arcee and AWS and post-trained Arcee AI's Trinity Mini (a 26B-parameter mixture-of-experts LLM with 3B active parameters) into a biomedical AI scientist, using RLVR with GRPO across two RL environments. It worked. Over 21 controlled auto-research runs, held-out Drug Tool accuracy climbed from 70.8% to 81.2%, and BioReason accuracy reached 86.3%. In this session we'll show you how: optimizing the environment before the policy, designing rewards that expose the right failures, rejecting plausible ablations, and keeping every single run inspectable. Then we close the loop, pairing the trained model with an open-source agentic harness that makes a strong model stronger. Our thesis is simple. Science needs models we can inspect, adapt, evaluate, and improve, not black boxes we can only query."
+      ],
+      "url": "https://lisbonai.org/talks/#bojan-jakimovski"
+    },
+    {
+      "slug": "matt-carey",
+      "speaker": "Matt Carey",
+      "org": "Cloudflare",
+      "track": "Agents",
+      "title": "Agents that Scale",
+      "abstract": [
+        "Build agents that scale up to everyone on the planet."
+      ],
+      "url": "https://lisbonai.org/talks/#matt-carey"
+    },
+    {
+      "slug": "marcelo-lebre",
+      "speaker": "Marcelo Lebre",
+      "org": "Remote",
+      "track": "Agents",
+      "title": "Icarus, operational harness",
+      "abstract": [
+        "At Remote we're building Icarus: a harness that runs a personal agent on your own machine, all day, alongside you. It watches how you actually work — the decisions that get made in threads, the context that only lives in your head, the sequence of steps you've repeated forty times without calling it a process. It turns that into a knowledge graph, identifies the repetitive work, and automates it. What each agent learns gets federated into a shared org-wide graph, so the same problem doesn't get solved twenty times."
+      ],
+      "url": "https://lisbonai.org/talks/#marcelo-lebre"
+    },
+    {
+      "slug": "vitalii-ratushnyi",
+      "speaker": "Vitalii Ratushnyi",
+      "org": "Harmix.AI",
+      "track": "Agents",
+      "title": "Agentic Memory in a nutshell: Do’s and Don’ts",
+      "abstract": [
+        "Context windows are barely working beyond 400k, and the context we work over across several days  easilty overcome 10-50M tokens. The community has no consensus over what memory looks like for long-running agents, with options ranging from classic vector stores as RAGs to file-based LLM wikis and beyond (Agentic RAG/SIRA). In this lightning talk I'll compress two years of research and production experience into how to organize scalable memory and share recipes that work."
+      ],
+      "url": "https://lisbonai.org/talks/#vitalii-ratushnyi"
+    },
+    {
+      "slug": "peter-kirkham",
+      "speaker": "Peter Kirkham",
+      "org": "PostHog",
+      "track": "Agents",
+      "title": "Teaching your product to fix and build itself",
+      "abstract": [
+        "Everyone demos an agent writing code. But how does the agent know what to work on? Peter Kirkham (PostHog) has spent the last year building the full loop. A product that watches its own telemetry, turns signals into tasks, hands tasks to agents, and publishes the resulting PRs. He'll cover how we built a self driving product and what you need to do to build your own."
+      ],
+      "url": "https://lisbonai.org/talks/#peter-kirkham"
+    },
+    {
+      "slug": "pedro-rodrigues",
+      "speaker": "Pedro Rodrigues",
+      "org": "Supabase",
+      "track": "Agents",
+      "title": "Apps Are the New Tools",
+      "abstract": [
+        "Agents are moving beyond simple tool calls. The next step is bringing interactive apps directly into the conversation: rich, contextual interfaces that help people inspect, decide, and act without jumping between links, dashboards, and screenshots.",
+        "In this lightning talk, I’ll demo an incident response workflow that starts with a pager alert and moves through triage, investigation, resolution, postmortem drafting, and team celebration, all inside a shared agent session. Using a mocked incident environment inspired by real engineering workflows, I’ll show why apps are becoming the new tools agents use to turn conversation into action."
+      ],
+      "url": "https://lisbonai.org/talks/#pedro-rodrigues"
+    },
+    {
+      "slug": "harshil-agrawal",
+      "speaker": "Harshil Agrawal",
+      "org": "Cloudflare",
+      "track": "Agents",
+      "title": "Ditching Containers for Computer",
+      "abstract": [
+        "Containers have become the default for running AI-generated code, but for interactive apps, the cold start tax kills you. PromptMotion, my AI video generation app waited seconds for a container to spin up before a user could see a preview. The cost of keeping containers warm was unsustainable. The architecture — Durable Objects, networking, lifecycle management — was more complex than the app itself. This talk covers my migration from containers to V8 isolates (Dynamic Workers). Sub-millisecond cold starts, lower cost, faster previews. But the move wasn't free: I lost the file system, had to rethink how skills and tools work inside an isolate, and rebuilt the previewing, rendering, and download pipeline from scratch. I'll show what broke, what I used to replace the file system, how Artifacts solved versioning, and what I'd do differently if I started over."
+      ],
+      "url": "https://lisbonai.org/talks/#harshil-agrawal"
+    },
+    {
+      "slug": "alcides-fonseca",
+      "speaker": "Alcides Fonseca",
+      "org": "U. Lisbon, DragonBoat",
+      "track": "Agents",
+      "title": "Guardrailing your Agents with Types and Logic",
+      "abstract": [
+        "LLMs can generate plans of action, usually as bash, python, AppleScript or other untyped programs. These plans can be wrong from the beginning, but you will have to execute them until you find out, possibly hours later.",
+        "I have built aeon, a programming language that features Liquid and Linear Types that reject during compilation programs that logically do not make sense. If your program has a bug in the last line, it will not start executing. These bugs are not necessarily about using an integer where you expect a boolean, but conceptual. You will not read from a file handle after you closed it. You will not train a NaiveBayes classifier on imbalanced data. You will not test your model on previously seen data. You will not start your drone without loading the flight plan first.",
+        "In this talk, I will show how to use aeon to design a DSL for your domain, and how to avoid conceptual bugs in your agents planning."
+      ],
+      "url": "https://lisbonai.org/talks/#alcides-fonseca"
+    },
+    {
+      "slug": "will-burstein",
+      "speaker": "Will Burstein",
+      "org": "PromptLayer",
+      "track": "Evals",
+      "title": "From Vibes to Scorecards: Building Review Loops for Production AI",
+      "abstract": [
+        "Most AI teams start quality review the same way: a few handpicked traces, a spreadsheet, and a debate over whether the output “feels right.” That breaks down quickly once an AI feature has real users, edge cases, workflow context, cost pressure, and multiple stakeholders. This talk takes apart a practical scorecard loop for production LLM apps: collecting representative traces, defining flexible criteria, layering human review with LLM-as-judge evaluators, and using the results to make release decisions. I’ll focus on what breaks in practice: brittle rubrics, evaluator drift, overfitting to demo examples, missing domain-expert input, and scorecards that become too engineering-centric for product teams to trust. The goal is to show the system and the tradeoffs, not pitch a product.",
+        "Takeaways:"
+      ],
+      "url": "https://lisbonai.org/talks/#will-burstein"
+    },
+    {
+      "slug": "thom-jenkins",
+      "speaker": "Thom Jenkins",
+      "org": "PetsApp",
+      "track": "Evals",
+      "title": "Your Agent Is Ignoring You: Fixing Instruction Drift in Production AI",
+      "abstract": [
+        "You've tried bribes. You've tried threats. YOUR ENTIRE PROMPT IS IN ALL CAPS AT THIS POINT. And yet, even with these highly sophisticated prompt engineering techniques, your agent still won't listen to you, or your users.",
+        "I've been there... PetsApp runs AI copilots across veterinary clinics, handling client communication, triage workflows, and operational support for millions of pets.",
+        "As these systems evolved larger context windows, more tools, and longer memory, I fully expected reliability to improve. But somehow our agent still repeatedly offered dog owners appointments at a cat-only clinic.",
+        "The instruction was right there in the prompt for all to see. But it had clearly lost behavioral dominance against competing context. We started calling this instruction drift: the tendency for important business and safety constraints to lose influence inside long-context agentic systems.",
+        "In this session we'll tear apart our naive prompt architecture in realtime, and demo the system built to investigate and mitigate the problem. We’ll decompose prompts into competing foci, run prompt ablation tests, measure instruction adherence, and iteratively reshape prompts to improve reliability.",
+        "The core operational insight: increasing context size often decreases instruction adherence unless attention is actively controlled."
+      ],
+      "url": "https://lisbonai.org/talks/#thom-jenkins"
+    },
+    {
+      "slug": "oguz-gultepe",
+      "speaker": "Oğuz Gültepe",
+      "org": "Peec AI",
+      "track": "Evals",
+      "title": "Prompt Learning: Distilling Expensive Reasoning Into Fast Production Prompts",
+      "abstract": [
+        "Most prompt engineering is a person staring at outputs and editing by hand. This talk shows how to automate that judgment instead. A small model generates outputs, a set of reward models score each one and explain its failures in natural language, and a heavy optimizer rewrites the meta-prompt from that feedback history. The loop repeats until rewards converge, and the result ships as a static prompt, so production pays no extra latency or cost.",
+        "The interesting part is where it goes wrong. I will walk through a production failure at Peec AI, where we run this loop to generate brand-tracking queries across many clients, languages, and markets. I will show how the optimizer can be working perfectly and still produce bad outputs when the reward is underspecified.",
+        "The takeaway for builders: reward design is the real engineering work, natural-language failure explanations are a far better signal than aggregate scores, and an expensive model earns its keep as an offline evaluator amortized over every future call."
+      ],
+      "url": "https://lisbonai.org/talks/#oguz-gultepe"
+    },
+    {
+      "slug": "yomi-eluwande",
+      "speaker": "Yomi Eluwande",
+      "org": "Dash0",
+      "track": "Evals",
+      "title": "Red teaming AI performance ideas: what survived measurement",
+      "abstract": [
+        "AI agents produce plenty of performance ideas. Deciding which are worth shipping is a separate problem.",
+        "Our product uses a hand-written Canvas flamegraph renderer that was already heavily optimized. We ran 43 agent passes and collected 66 proposed optimizations. Microbenchmarks reduced the list to eight candidates. Live product measurements reduced it to one PR with two changes.",
+        "The first change merged two render passes and used a cached character-width table for label fitting. The second copied layout values into flat Float64Array data. This removed repeated Arrow reads and numeric conversions from each repaint.",
+        "Normal renders moved from about 21 ms to 6 ms. Inverted renders moved from about 44 ms to 8 ms. This lightning talk shows how the two changes work, and why measurement rejected the more obvious ideas."
+      ],
+      "url": "https://lisbonai.org/talks/#yomi-eluwande"
+    },
+    {
+      "slug": "simao-nogueira",
+      "speaker": "Simão Nogueira",
+      "org": "Noticed",
+      "track": "Evals",
+      "title": "Evals as the code factory",
+      "abstract": [
+        "There’s 8 coding agents running in parallel on my machine at all times, each in its own git worktree. At night I hand each agent a wider goal to pursue alone, then steer the outcome over coffee the next morning. That’s billions of tokens per month. No team can review the performance of that much output. Mine certainly can’t.",
+        "When your team’s small or your output outpaces your QA, linters, evals and “intelligent” CI can inherit the job code reviewers used to do. The catch is that the agent doing the work is also the agent evaluating it, and when a model is asked to make a number go up, lowering the threshold can look reasonable from where it stands.",
+        "That means at noticed, evals have to be impossible to game, whether they’re testing query efficiency or design system adherence. The clearest example: one of noticed’s core AI models does identity matching — deciding whether two accounts belong to the same human. Merging two different people is a failure we can’t accept. The eval has to make that failure visible, while independently and correctly guiding the agent’s work to improve the model.",
+        "I’ll showcase three of our open-source skills that enforce this discipline — including one that made our ClickHouse queries 5.6x faster — show how we use them in our agent workflows, and cover the last-mile work that still requires human input."
+      ],
+      "url": "https://lisbonai.org/talks/#simao-nogueira"
+    },
+    {
+      "slug": "steve-ruiz",
+      "speaker": "Steve Ruiz",
+      "org": "tldraw",
+      "track": "Applied AI",
+      "title": "Bringing tldraw offline",
+      "abstract": [
+        "Earlier this year, we launched tldraw offline, a file-based desktop application that brings the infinite canvas experience to your computer. Over the course of development, we also realized that this approach allows it to play incredibly well with local coding agents, allowing them to edit the canvas, as well as make their own custom shapes, hooks, and behaviors. This talk will go into how we developed the system that lets your agents customize the canvas, as well as some of the exciting things we've built."
+      ],
+      "url": "https://lisbonai.org/talks/#steve-ruiz"
+    },
+    {
+      "slug": "daniel-bukac",
+      "speaker": "Daniel Bukac",
+      "org": "Duvo",
+      "track": "Applied AI",
+      "title": "Screen-aware voice agents: a new interaction pattern",
+      "abstract": [
+        "A third mode of HCI: not typing at a chatbot, not screen-sharing with a person — a real-time voice agent that watches your screen as you work. Built for Clarity. What makes it work:",
+        "Two agents, split by job — a fast realtime voice model owns the conversation and its sub-second latencyA smarter model runs silently behind it — Claude reads the transcript + screenshots every few seconds and keeps the canonical state; the voice agent pulls it on demandWatching a screen cheaply — 5 fps capture, drop any frame that changed <10%, so a static screen costs zero vision tokensAlignment is just a wall clock — frames named by timestamp, no semantic matching; survives dropped frames and blips"
+      ],
+      "url": "https://lisbonai.org/talks/#daniel-bukac"
+    },
+    {
+      "slug": "francisco-leal",
+      "speaker": "Francisco Leal",
+      "org": "UB Robotics",
+      "track": "Applied AI",
+      "title": "VdG: a Physical AI system that works without cloud, GPS, or reliable network",
+      "abstract": [
+        "VdG is UBR’s current field robotics prototype.",
+        "In this demo, I'll show what we have built so far: the robot, the control layer, the operator interface and the autonomy work behind it. The session will combine robot footage and hardware context with a screen share of the software used to monitor, control and improve the system.",
+        "We’ll show what works even if it's rough, what we are learning from testing, and how VdG is evolving into a reliable field robot for real-world operations."
+      ],
+      "url": "https://lisbonai.org/talks/#francisco-leal"
+    },
+    {
+      "slug": "cristiana-carpinteiro",
+      "speaker": "Cristiana Carpinteiro",
+      "org": "Loka",
+      "track": "Applied AI",
+      "title": "LLMs learned to read and write human language",
+      "abstract": [
+        "Can the same architectures learn to read the language of biology, well enough to help scientists discover new drugs? At Loka, we've been helping clients answer this question by working with companies at every stage of the drug discovery pipeline. In this talk, we'll cover where foundation models can already help, what's still hype, and what gaps remain. We'll ground this in our own experience with a leading biopharma company developing drugs for cancer and immune diseases, where we helped build a foundation model to screen their 5-billion-molecule library. This tool is used daily by scientists to help them decide which molecules move to the lab, and it has already identified molecules that actually bind to the targets of interest."
+      ],
+      "url": "https://lisbonai.org/talks/#cristiana-carpinteiro"
+    },
+    {
+      "slug": "lukas-wirth",
+      "speaker": "Lukas Wirth",
+      "org": "Zed",
+      "track": "Applied AI",
+      "title": "Post-Git Agentic Collaboration",
+      "abstract": [
+        "The more we work with AI agents, the more Git’s limits become our limits. Git preserves snapshots of code, not the conversations and intermediate decisions agents need to understand a project, forcing people to reconstruct that state whenever work changes hands. This talk demonstrates Delta, a native and web collaboration environment backed by DeltaDB, where fine-grained history keeps code and conversation together in shared multiplayer threads so humans and agents can inspect, continue and shape the same work."
+      ],
+      "url": "https://lisbonai.org/talks/#lukas-wirth"
+    },
+    {
+      "slug": "aayush-kapoor",
+      "speaker": "Aayush Kapoor",
+      "org": "Vercel",
+      "track": "Applied AI",
+      "title": "The Slopbowl-ification of Software",
+      "abstract": [
+        "AI has made writing code dramatically cheaper. We can add another feature, abstraction, integration or configuration option almost instantly. Software is beginning to resemble a slopbowl: you start with a base, keep adding ingredients and hope the result is better than the sum of its parts. But every addition changes the whole system. One bad ingredient can overwhelm the bowl, causing even individually reasonable features to turn useful software into an incoherent, bloated system. Taste becomes the differentiator. In this talk, we’ll examine the importance of strong foundations, the hidden cost of “just one more prompt bro” and why restraint and taste become more valuable as code gets cheaper."
+      ],
+      "url": "https://lisbonai.org/talks/#aayush-kapoor"
+    },
+    {
+      "slug": "luis-monteiro",
+      "speaker": "Luis Monteiro",
+      "org": "Pixelmatters",
+      "track": "Applied AI",
+      "title": "Design is over",
+      "abstract": [
+        "If AI begins with a prompt, does creativity still begin with a canvas? As AI reshapes the way we create, this talk explores the evolving relationship between the two — and asks why the canvas still matters in a world where almost anything can be generated."
+      ],
+      "url": "https://lisbonai.org/talks/#luis-monteiro"
+    },
+    {
+      "slug": "diogo-monica",
+      "speaker": "Diogo Mónica",
+      "org": "Anchorage, Haun Ventures",
+      "track": "Security",
+      "title": "AI Escapes: Super Intelligence or Super Incompetence",
+      "abstract": [
+        "Abstract coming soon!"
+      ],
+      "url": "https://lisbonai.org/talks/#diogo-monica"
+    },
+    {
+      "slug": "afonso-oliveira",
+      "speaker": "Afonso Oliveira",
+      "org": "OliveGradient",
+      "track": "Security",
+      "title": "Building AI people trust without giving away the product",
+      "abstract": [
+        "AI products are increasingly asking users for their most sensitive data: private thoughts, health information, personal journals, and conversations they would never have anywhere else. That creates an uncomfortable trade-off.",
+        "Keep the data on the user’s device, and privacy improves... but now the AI model and the entire inference pipeline have to run where an attacker can inspect them. Keep the computation in the cloud, and the company can protect its IP... but users have to trust someone else with their most private data.",
+        "Confidential computing seems to offer a way out: run the AI inside a protected environment that neither the cloud provider nor the user can inspect. But hardware isolation alone doesn’t solve the trust problem. Users need a way to verify that their data stays inside that protected environment, while companies need to keep parts of their implementation secret.",
+        "This talk explores the engineering problem of making both possible at once.",
+        "Using an AI journaling application as a case study, we’ll walk through the architecture, the security boundaries, the trade-offs, the code, and the cloud infrastructure behind it.",
+        "The goal isn’t another introduction to confidential computing. It’s a practical look at what it takes to build an AI product where the user can trust what happens to their data without the company having to give away how the product works."
+      ],
+      "url": "https://lisbonai.org/talks/#afonso-oliveira"
+    },
+    {
+      "slug": "boda-zhao",
+      "speaker": "Boda Zhao",
+      "org": "YLD",
+      "track": "Security",
+      "title": "Prevent supply chain attacks in coding agents",
+      "abstract": [
+        "Autonomous agents are accelerating development, but they also increase the risk of supply chain attacks. This talk outlines actionable strategies to secure coding agents and broader agentic workflows. Attendees will leave with a clear mental starting point to help their teams navigate this rapidly evolving threat landscape."
+      ],
+      "url": "https://lisbonai.org/talks/#boda-zhao"
+    },
+    {
+      "slug": "nina-torgunakova",
+      "speaker": "Nina Torgunakova",
+      "org": "Evil Martians",
+      "track": "Security",
+      "title": "Trust nothing, ship safely: surviving the supply chain attack era",
+      "abstract": [
+        "Supply chain attacks are no longer a theoretical threat — they are a daily reality. npm packages, including some of the most widely used libraries in the ecosystem, have been weaponized to compromise thousands of developers and their users at once. New incidents surface every day, each one larger than the last, and no project is out of reach.",
+        "Every breach gets its post-mortem. But by the time you read it, the next attack is already being planned.",
+        "This talk is about getting ahead of it. I'll walk through two real dependency updates, live, using Multiocular — the open-source tool we built at Evil Martians for reviewing dependency changes: one harmless, one carrying a malicious change. You'll see what actually separates them once you stop trusting the version number and start looking at the diff. By the end, you'll know how to ask the one question that actually matters about everything you depend on: why do I trust this?"
+      ],
+      "url": "https://lisbonai.org/talks/#nina-torgunakova"
+    },
+    {
+      "slug": "artur-goulao",
+      "speaker": "Artur Goulão",
+      "org": "Humanos",
+      "track": "Security",
+      "title": "Runtime Trust for AI: Building the Network That Verifies Autonomous Systems",
+      "abstract": [
+        "AI agents are beginning to operate autonomously across finance, healthcare and enterprise software, but every critical action still depends on a simple question:",
+        "Can this AI be trusted before it acts?",
+        "In this talk we'll demonstrate the Runtime Trust Network, a new trust infrastructure that allows any system to independently verify AI identity, delegated authority, runtime controls and execution proofs through a single API before an AI action takes place. Under the hood, agents and their human principals are first-class identities (DIDs), and delegated authority flows between them as verifiable credential mandates: W3C Verifiable Credentials 2.0, selectively disclosable via SD-JWT, scoped, revocable and ephemeral, with permanent accountability.",
+        "Rather than presenting another governance framework, we'll show the system live: how trust events are recorded as signed receipts into a cryptographically verifiable chain, how they become independently verifiable by anyone from public keys alone with no consensus layer required, how applications consume them through the Runtime Trust API, and how these runtime trust signals enable entirely new products.",
+        "As a concrete example, we'll demonstrate how AI insurers can build real-time underwriting models using live operational evidence (receipt chains, mandate histories and enforcement records) instead of static questionnaires and historical claims data, allowing policies to evolve continuously as AI systems operate.",
+        "The session is a technical walkthrough of the architecture, APIs and runtime verification flow behind the Runtime Trust Network, with a live end-to-end demo: an agent is verified against the network, executes a delegated payment under a scoped mandate, attempts to exceed it, is deterministically blocked, and the resulting receipt chain is independently verified."
+      ],
+      "url": "https://lisbonai.org/talks/#artur-goulao"
+    }
+  ]
+}

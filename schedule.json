@@ -1,0 +1,79 @@
+{
+  "conference": "Lisbon AI 2026",
+  "venue": "Champalimaud Centre for the Unknown, Belém, Lisbon",
+  "timezone": "Europe/Lisbon",
+  "source": "https://lisbonai.org/schedule/",
+  "note": "The site publishes times per block, not per talk. Talks inside a block are spread evenly across it; those per-talk times are estimates.",
+  "days": [
+    {
+      "day": 1,
+      "date": "2026-09-23",
+      "blocks": [
+        {"start": "09:00", "end": "09:30", "kind": "break", "title": "Arrival & coffee"},
+        {"start": "09:30", "end": "09:45", "kind": "break", "title": "Opening"},
+        {"start": "09:45", "end": "11:15", "kind": "talks", "track": "Models", "talks": [
+          {"short": "Inference Engineering", "title": "Inference Engineering: Frontier Open Models on the Hardware You Already Own", "speaker": "Prince Canuma", "org": "Neywa Labs"},
+          {"short": "Design as visual code", "title": "Design as visual code", "speaker": "Joan Rodriguez", "org": "QuiverAI"},
+          {"short": "Spatial AI & 3D World Models", "title": "Spatial AI and 3D World Models", "speaker": "Chema Garabito", "org": "Sperid Labs"}
+        ]},
+        {"start": "11:15", "end": "11:45", "kind": "break", "title": "Coffee break"},
+        {"start": "11:45", "end": "13:00", "kind": "talks", "track": "Models", "talks": [
+          {"short": "European Portuguese LLMs", "title": "The Hitchhiker's Guide to European Portuguese LLMs", "speaker": "Duarte Carmo", "org": "Independent"},
+          {"short": "Training a coding agent", "title": "Training a coding agent through a harness you did not write", "speaker": "Sergio Paniego", "org": "Hugging Face"},
+          {"short": "Open Model does science", "title": "Teaching an Open Model to do Science", "speaker": "Bojan Jakimovski", "org": "Loka"}
+        ]},
+        {"start": "13:00", "end": "14:30", "kind": "break", "title": "Riverside lunch", "subtitle": "Powered by YLD"},
+        {"start": "14:30", "end": "16:30", "kind": "talks", "track": "Agents", "talks": [
+          {"short": "Agents that Scale", "title": "Agents that Scale", "speaker": "Matt Carey", "org": "Cloudflare"},
+          {"short": "Icarus, operational harness", "title": "Icarus, operational harness", "speaker": "Marcelo Lebre", "org": "Remote"},
+          {"short": "Agentic Memory in a nutshell", "title": "Agentic Memory in a nutshell: Do's and Don'ts", "speaker": "Vitalii Ratushnyi", "org": "Harmix.AI"},
+          {"short": "Products that fix themselves", "title": "Teaching your product to fix and build itself", "speaker": "Peter Kirkham", "org": "PostHog"},
+          {"short": "Apps Are the New Tools", "title": "Apps Are the New Tools", "speaker": "Pedro Rodrigues", "org": "Supabase"},
+          {"short": "Ditching Containers", "title": "Ditching Containers for Computer", "speaker": "Harshil Agrawal", "org": "Cloudflare"},
+          {"short": "Guardrailing your Agents", "title": "Guardrailing your Agents with Types and Logic", "speaker": "Alcides Fonseca", "org": "U. Lisbon, DragonBoat"}
+        ]},
+        {"start": "16:30", "end": "17:00", "kind": "break", "title": "Coffee break"},
+        {"start": "17:00", "end": "18:30", "kind": "talks", "track": "Evals", "talks": [
+          {"short": "From Vibes to Scorecards", "title": "From Vibes to Scorecards: Building Review Loops for Production AI", "speaker": "Will Burstein", "org": "PromptLayer"},
+          {"short": "Your Agent Is Ignoring You", "title": "Your Agent Is Ignoring You: Fixing Instruction Drift in Production AI", "speaker": "Thom Jenkins", "org": "PetsApp"},
+          {"short": "Prompt Learning", "title": "Prompt Learning: Distilling Expensive Reasoning Into Fast Production Prompts", "speaker": "Oguz Gultepe", "org": "Peec AI"},
+          {"short": "Red teaming perf ideas", "title": "Red teaming AI performance ideas: what survived measurement", "speaker": "Yomi Eluwande", "org": "Dash0"},
+          {"short": "Evals as the code factory", "title": "Evals as the code factory", "speaker": "Simao Nogueira", "org": "Noticed"}
+        ]},
+        {"start": "18:30", "end": "20:00", "kind": "break", "title": "Sunset Party"}
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2026-09-24",
+      "blocks": [
+        {"start": "09:00", "end": "09:30", "kind": "break", "title": "Arrival & coffee"},
+        {"start": "09:30", "end": "09:45", "kind": "break", "title": "Opening w/ Cloudflare"},
+        {"start": "09:45", "end": "11:30", "kind": "talks", "track": "Applied AI", "talks": [
+          {"short": "Bringing tldraw offline", "title": "Bringing tldraw offline", "speaker": "Steve Ruiz", "org": "tldraw"},
+          {"short": "Screen-aware voice agents", "title": "Screen-aware voice agents: a new interaction pattern", "speaker": "Daniel Bukac", "org": "Duvo"},
+          {"short": "VdG: Physical AI offline", "title": "VdG: a Physical AI system that works without cloud, GPS, or reliable network", "speaker": "Francisco Leal", "org": "UB Robotics"},
+          {"short": "LLMs read and write", "title": "LLMs learned to read and write human language", "speaker": "Cristiana Carpinteiro", "org": "Loka"}
+        ]},
+        {"start": "11:30", "end": "12:00", "kind": "break", "title": "Coffee break"},
+        {"start": "12:00", "end": "13:10", "kind": "talks", "track": "Applied AI", "talks": [
+          {"short": "Post-Git Agentic Collab", "title": "Post-Git Agentic Collaboration", "speaker": "Lukas Wirth", "org": "Zed"},
+          {"short": "Slopbowl-ification", "title": "The Slopbowl-ification of Software", "speaker": "Aayush Kapoor", "org": "Vercel"},
+          {"short": "Design is over", "title": "Design is over", "speaker": "Luis Monteiro", "org": "Pixelmatters"}
+        ]},
+        {"start": "13:10", "end": "13:15", "kind": "break", "title": "Intro to CNCA (BSC AI Factory)"},
+        {"start": "13:15", "end": "14:45", "kind": "break", "title": "Riverside lunch"},
+        {"start": "14:45", "end": "16:00", "kind": "talks", "track": "Security", "talks": [
+          {"short": "AI Escapes", "title": "AI Escapes: Super Intelligence or Super Incompetence", "speaker": "Diogo Monica", "org": "Anchorage, Haun Ventures"},
+          {"short": "AI people trust", "title": "Building AI people trust without giving away the product", "speaker": "Afonso Oliveira", "org": "OliveGradient"},
+          {"short": "Supply chain in agents", "title": "Prevent supply chain attacks in coding agents", "speaker": "Boda Zhao", "org": "YLD"},
+          {"short": "Trust nothing, ship safely", "title": "Trust nothing, ship safely: surviving the supply chain attack era", "speaker": "Nina Torgunakova", "org": "Evil Martians"},
+          {"short": "Runtime Trust for AI", "title": "Runtime Trust for AI: Building the Network That Verifies Autonomous Systems", "speaker": "Artur Goulao", "org": "Humanos"}
+        ]},
+        {"start": "16:00", "end": "16:15", "kind": "break", "title": "Closing"},
+        {"start": "16:15", "end": "17:45", "kind": "break", "title": "Coffee break", "subtitle": "Side projects w/ David Gomes"},
+        {"start": "17:45", "end": "20:00", "kind": "break", "title": "Networking"}
+      ]
+    }
+  ]
+}
