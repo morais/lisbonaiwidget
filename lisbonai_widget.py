@@ -301,7 +301,7 @@ def build_card(segments, now, day_number, next_push):
         "id": CARD_ID,
         "template": "briefing",
         "title": "Lisbon AI",
-        "producer": {"label": "Lisbon AI schedule", "icon": "calendar"},
+        "producer": {"label": "Schedule watcher", "icon": "calendar"},
         "deepLink": DEEP_LINK,
         "staleAfter": iso(next_push + timedelta(minutes=30)),
         "priority": 10,  # ahead of the household cards while the conference runs
@@ -353,16 +353,25 @@ def build_card(segments, now, day_number, next_push):
     day_start = segments[0]["start"]
     before = now < day_start
     first = next(s for s in segments if s["kind"] == "talk")
+    if before:
+        sections = [{"id": "first", "label": f"Opens with · {first['track']} {starts(first)}",
+                     "text": f"{first['title']} — {first['sub']}"}]
+        for i, para in enumerate(paragraphs((first.get("detail") or {}).get("abstract", []))):
+            sections.append({"id": f"abstract-{i}", "text": para})
+        after = [s for s in segments if s["kind"] == "talk" and s is not first][:1]
+        for nxt in after:
+            sections.append({"id": "then", "label": f"Then · {starts(nxt)}",
+                             "text": f"{nxt['title']} — {nxt['sub']}"})
+    else:
+        sections = [{"id": "done", "text": "The programme is over for today."}]
     card.update({
         "value": (f"Day {day_number} · {day_start.strftime('%a %d %b')}" if before
                   else f"Day {day_number} wrapped"),
         "subtitle": (f"Doors {hhmm(day_start)} · first talk {starts(first)}" if before
                      else "See you tomorrow"),
         "status": "unknown" if before else "finished",
-        "icon": "calendar",
-        "briefing": {"sections": [{"id": "first", "label": "Opens with",
-                                   "text": f"{first['title']} — {first['sub']}"}]} if before else
-                    {"sections": [{"id": "done", "text": "The programme is over for today."}]},
+        "icon": "mic.fill",
+        "briefing": {"sections": sections[:7]},
     })
     if before:
         card["deadline"] = iso(day_start)
