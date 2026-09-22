@@ -519,12 +519,19 @@ def main():
         args.at = None  # the real clock is the point
     day, segments = build_timeline(args.day, anchor, offset)
 
+    origin = datetime.now()
+    if args.at:
+        h, m = (int(x) for x in args.at.split(":"))
+        origin = datetime.combine(anchor, datetime.min.time()) + timedelta(hours=h, minutes=m)
+
     def clock(elapsed=0.0):
-        base = datetime.now()
-        if args.at:
-            h, m = (int(x) for x in args.at.split(":"))
-            base = datetime.combine(anchor, datetime.min.time()) + timedelta(hours=h, minutes=m)
-        return base + timedelta(seconds=elapsed * args.speed)
+        """Time now, as the schedule sees it.
+
+        `origin` is read once and frozen: elapsed time is the only thing that
+        moves it. Re-reading the wall clock here and adding elapsed on top
+        advances the day at twice real speed.
+        """
+        return origin + timedelta(seconds=elapsed * args.speed)
 
     now = clock()
     if args.card_only:
