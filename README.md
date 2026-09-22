@@ -161,4 +161,8 @@ explicit one.
 | `schedule.json` | the programme, both days |
 | `talks.json` | abstracts, generated |
 
-Schedule and talk content belong to [Lisbon AI](https://lisbonai.org).
+## License
+
+[MIT](LICENSE). Schedule and talk content belong to
+[Lisbon AI](https://lisbonai.org) and are reproduced here for the widget's
+own use.
