@@ -31,6 +31,11 @@ CARD_ID = "lisbonai-now"
 ROWS = 4                  # current + next 3; the Lock Screen draws 3 and "+1 more"
 HEARTBEAT = 10 * 60       # push at least this often, so staleAt stays ahead
 POLL = 20                 # how often --watch re-evaluates the schedule
+# iOS ends a Live Activity after about 8 hours of runtime, and a conference day
+# is longer than that. Restart before the system does it for us — preferably on
+# a break, since a restart is a visible dismiss-and-reappear.
+RESTART_PREFERRED = 6.5 * 3600
+RESTART_FORCED = 7.5 * 3600
 
 
 # ---------------------------------------------------------------- environment
@@ -66,6 +71,15 @@ def load_abstracts():
     if not path.exists():
         return {}
     return {fold(t["speaker"]): t for t in json.loads(path.read_text())["talks"]}
+
+
+def day_date(day_number):
+    """The day's own calendar date, as published."""
+    data = json.loads((ROOT / "schedule.json").read_text())
+    day = next((d for d in data["days"] if d["day"] == day_number), None)
+    if day is None:
+        sys.exit(f"No day {day_number} in schedule.json")
+    return datetime.strptime(day["date"], "%Y-%m-%d").date()
 
 
 def build_timeline(day_number, anchor_date, offset=timedelta(0)):
@@ -422,6 +436,9 @@ def main():
                    help="slide the whole programme so this moment lands on the real clock; "
                         "the only way a demo gets an honest countdown on the device")
     p.add_argument("--date", metavar="YYYY-MM-DD", help="hang the programme on this date (default: today)")
+    p.add_argument("--offset", type=float, metavar="HOURS",
+                   help="shift the programme from its real date by this many hours; "
+                        "negative runs it early, so --offset -24 rehearses day 1 a day ahead")
     p.add_argument("--watch", action="store_true", help="keep it honest: push at every change until the day ends")
     p.add_argument("--speed", type=float, default=1.0, help="with --watch, run the clock this many times faster (demo)")
     p.add_argument("--poll", type=float, default=POLL, metavar="SECONDS",
@@ -441,8 +458,13 @@ def main():
     if args.end:
         return finish(env, args.day, args.dry_run, "Ended by hand")
 
-    anchor = datetime.strptime(args.date, "%Y-%m-%d").date() if args.date else datetime.now().date()
-    offset = timedelta(0)
+    if args.offset is not None and not args.date:
+        anchor = day_date(args.day)          # shift from the real date, not from today
+    elif args.date:
+        anchor = datetime.strptime(args.date, "%Y-%m-%d").date()
+    else:
+        anchor = datetime.now().date()
+    offset = timedelta(hours=args.offset) if args.offset is not None else timedelta(0)
     if args.now_is:
         h, m = (int(x) for x in args.now_is.split(":"))
         offset = datetime.now() - (datetime.combine(anchor, datetime.min.time())
@@ -471,7 +493,7 @@ def main():
         return
 
     began = time.monotonic()
-    last_key, last_push = key(current), now
+    last_key, last_push, activity_began = key(current), now, time.monotonic()
     try:
         while True:
             time.sleep(args.poll)
@@ -480,9 +502,17 @@ def main():
                 break
             current, _ = where_are_we(segments, now)
             changed = key(current) != last_key
-            if changed or (now - last_push).total_seconds() >= HEARTBEAT:
-                publish(env, args.day, day, segments, now, started=True, dry_run=args.dry_run,
-                        with_card=changed and not args.no_card)
+            running_for = (time.monotonic() - activity_began) * args.speed
+            expiring = (running_for > RESTART_FORCED
+                        or (running_for > RESTART_PREFERRED
+                            and current is not None and current["kind"] == "break"))
+            if changed or expiring or (now - last_push).total_seconds() >= HEARTBEAT:
+                if expiring:
+                    print(f"[{hhmm(now)}] restarting before the 8h Live Activity ceiling "
+                          f"({running_for / 3600:.1f}h in)")
+                    activity_began = time.monotonic()
+                publish(env, args.day, day, segments, now, started=not expiring,
+                        dry_run=args.dry_run, with_card=changed and not args.no_card)
                 last_key, last_push = key(current), now
     except KeyboardInterrupt:
         print("\ninterrupted")
