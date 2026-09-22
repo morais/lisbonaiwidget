@@ -23,7 +23,7 @@ import time
 import urllib.error
 import unicodedata
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 ROOT = pathlib.Path(__file__).resolve().parent
 DEEP_LINK = "https://lisbonai.org/schedule/"
@@ -34,8 +34,8 @@ POLL = 20                 # how often --watch re-evaluates the schedule
 # iOS ends a Live Activity after about 8 hours of runtime, and a conference day
 # is longer than that. Restart before the system does it for us — preferably on
 # a break, since a restart is a visible dismiss-and-reappear.
-RESTART_PREFERRED = 6.5 * 3600
-RESTART_FORCED = 7.5 * 3600
+CEILING = 7.5 * 3600      # restart before iOS reaches its ~8h limit for us
+ACTIVITY_LEAD = 15 * 60   # start the banner this long before doors, not sooner
 
 
 # ---------------------------------------------------------------- environment
@@ -418,7 +418,8 @@ def started_at(env, day_number):
         with urllib.request.urlopen(req, timeout=30) as resp:
             for a in json.loads(resp.read())["activities"]:
                 if a["externalActivityId"] == activity_id(day_number):
-                    return datetime.strptime(a["startedAt"][:19], "%Y-%m-%dT%H:%M:%S")
+                    return (datetime.strptime(a["startedAt"][:19], "%Y-%m-%dT%H:%M:%S")
+                            .replace(tzinfo=timezone.utc))
     except (urllib.error.HTTPError, urllib.error.URLError, KeyError, ValueError):
         pass
     return None
@@ -524,14 +525,19 @@ def main():
         h, m = (int(x) for x in args.at.split(":"))
         origin = datetime.combine(anchor, datetime.min.time()) + timedelta(hours=h, minutes=m)
 
+    simulating = bool(args.at) or args.speed != 1.0
+
     def clock(elapsed=0.0):
         """Time now, as the schedule sees it.
 
-        `origin` is read once and frozen: elapsed time is the only thing that
-        moves it. Re-reading the wall clock here and adding elapsed on top
-        advances the day at twice real speed.
+        A real run just asks the wall clock, which survives the machine
+        sleeping. A simulation moves a frozen origin by elapsed time instead —
+        and only a simulation, because re-reading the wall clock AND adding
+        elapsed on top advances the day at twice real speed.
         """
-        return origin + timedelta(seconds=elapsed * args.speed)
+        if simulating:
+            return origin + timedelta(seconds=elapsed * args.speed)
+        return datetime.now()
 
     now = clock()
     if args.card_only:
@@ -540,6 +546,20 @@ def main():
         current, _ = where_are_we(segments, now)
         print(f"[{hhmm(now)}] card   · {current['label'] if current else '—'}")
         return
+    # Launched the night before: put the card up now, but hold the banner. A
+    # Live Activity started 20 hours early spends its whole 8-hour ceiling
+    # saying "starts soon" and is gone by the time anyone is on stage.
+    lead = segments[0]["start"] - timedelta(seconds=ACTIVITY_LEAD)
+    if args.watch and not simulating and now < lead:
+        if not args.no_card:
+            call(env, "/v1/cards/upsert", build_card(segments, now, args.day, lead), args.dry_run)
+        print(f"[{hhmm(now)}] card published · holding the Live Activity until "
+              f"{hhmm(lead)} on {lead.strftime('%a %d %b')} "
+              f"({(lead - now).total_seconds() / 3600:.1f}h)")
+        while clock() < lead:
+            time.sleep(min(max(args.poll, 1) * 15, 300))
+        now = clock()
+
     current, _ = publish(env, args.day, day, segments, now, started=args.update or args.resume,
                          dry_run=args.dry_run, with_card=not args.no_card)
 
@@ -547,12 +567,12 @@ def main():
         return
 
     began = time.monotonic()
-    activity_began = time.monotonic()
-    if args.resume:                       # the activity is older than this process
+    activity_began = now                  # on the schedule's clock: monotonic() stops
+    if args.resume:                       # while the machine sleeps, wall time does not
         since = started_at(env, args.day)
         if since:
-            age = (datetime.now(since.tzinfo or None) - since).total_seconds()
-            activity_began = time.monotonic() - max(age, 0) / max(args.speed, 1e-9)
+            age = max((datetime.now(timezone.utc) - since).total_seconds(), 0)
+            activity_began = now - timedelta(seconds=age * args.speed)
             print(f"resumed an activity already {age / 3600:.1f}h old")
     last_key, last_push = key(current), now
     try:
@@ -563,15 +583,25 @@ def main():
                 break
             current, _ = where_are_we(segments, now)
             changed = key(current) != last_key
-            running_for = (time.monotonic() - activity_began) * args.speed
-            expiring = (running_for > RESTART_FORCED
-                        or (running_for > RESTART_PREFERRED
+            # Restart only when this activity cannot last to the end of the
+            # programme — and then at a break, since it costs a visible
+            # dismiss-and-reappear. A plain age threshold restarts again during
+            # the evening, when the one already running would have been fine.
+            running_for = (now - activity_began).total_seconds()
+            remaining = (segments[-1]["end"] - now).total_seconds()
+            # Two conditions, and both matter: this activity cannot reach the
+            # end, AND a fresh one started now could. The second is what stops
+            # it restarting on every poll of a break that is simply too early.
+            wont_make_it = running_for + remaining > CEILING
+            restart_now_works = remaining <= CEILING
+            expiring = (running_for > CEILING
+                        or (wont_make_it and restart_now_works
                             and current is not None and current["kind"] == "break"))
             if changed or expiring or (now - last_push).total_seconds() >= HEARTBEAT:
                 if expiring:
                     print(f"[{hhmm(now)}] restarting before the 8h Live Activity ceiling "
                           f"({running_for / 3600:.1f}h in)")
-                    activity_began = time.monotonic()
+                    activity_began = now
                 publish(env, args.day, day, segments, now, started=not expiring,
                         dry_run=args.dry_run, with_card=changed and not args.no_card)
                 last_key, last_push = key(current), now
