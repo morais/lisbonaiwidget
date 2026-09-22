@@ -1,14 +1,31 @@
-# Lisbon AI 2026 — Lock Screen & Home Screen
+# Lisbon AI 2026 on your Lock Screen
 
 Publishes the [Lisbon AI 2026](https://lisbonai.org) programme to
-[00Widget](https://api.00widget.com), on two surfaces:
+[00Widget](https://00widget.com), so the conference schedule lives on your
+phone instead of in a browser tab you keep re-opening.
 
-- **Live Activity** (Lock Screen / Dynamic Island) — what is on stage now, the
-  next three talks, and a countdown to the end of the current one.
-- **Card** (Home Screen widget) — the current talk with its abstract from
-  [lisbonai.org/talks](https://lisbonai.org/talks/), and what follows it.
+Two surfaces, from one schedule:
 
-Conference: **23–24 September 2026**, Champalimaud Centre for the Unknown, Belém.
+**Live Activity** — Lock Screen and Dynamic Island. What is on stage now, the
+next three talks with their speakers, and a countdown to the end of the current
+one.
+
+```
+Lisbon AI · Day 1                             Agents
+Agentic Memory in a nutshell: Do's and Don'ts  ~12 min
+  ▸ Agentic Memory in a nutshell   Vitalii Ratushnyi · Harmix.AI     now
+    Products that fix themselves   Peter Kirkham · PostHog        ~15:21
+    Apps Are the New Tools         Pedro Rodrigues · Supabase     ~15:38
+    + 1 more
+```
+
+**Card** — Home Screen widget. The current talk with its full abstract from
+[lisbonai.org/talks](https://lisbonai.org/talks/), the track and slot, and
+what follows it. Outside conference hours it becomes a countdown to the next
+day's doors, carrying the opening talk's blurb, so it is safe to leave up.
+
+The conference is **23–24 September 2026** at the Champalimaud Centre for the
+Unknown, Belém, Lisbon.
 
 ## Setup
 
@@ -16,64 +33,72 @@ Conference: **23–24 September 2026**, Champalimaud Centre for the Unknown, Bel
 cp .env.example .env     # then paste your 00Widget publisher token in
 ```
 
-`.env` is gitignored — the token never enters the repo, so this can be public.
-Python 3.9+, no dependencies.
+Python 3.9+, no dependencies. `.env` is gitignored and no token has ever been
+committed, which is why this repo can be public.
 
 ## Running it
 
-The one that matters, on each conference morning:
+On each conference morning:
 
 ```sh
 ./lisbonai_widget.py --day 1 --watch
 ```
 
-It starts the activity, pushes a new state at every talk change plus a
-10-minute heartbeat, and ends the activity when the day is over. Ctrl-C also
-ends it cleanly. Every push carries `staleAt`, so if the process dies the Lock
-Screen says it is out of date rather than lying about the current talk.
+That starts the Live Activity, publishes the card, pushes a new state at every
+talk change plus a 10-minute heartbeat, and ends the activity when the day is
+over. Ctrl-C ends it cleanly too.
 
-| Command | What it does |
+| Flag | What it does |
 | --- | --- |
-| `--day 1 --watch` | the real thing: run it all day |
-| `--day 1 --at 14:40` | one push, pretending it is 14:40 |
-| `--day 1 --now-is 14:40` | slides the programme so 14:40 is *now* — the only way a rehearsal gets an honest countdown on the device |
-| `--day 1 --update` | push to the running activity instead of restarting it |
-| `--day 1 --card-only` | publish just the Home Screen card |
-| `--day 1 --no-card` | publish just the Lock Screen activity |
-| `--day 1 --end` | end the activity |
+| `--day N` | which conference day's programme to publish (default 1) |
+| `--watch` | run all day, pushing at every change |
+| `--resume` | with `--watch`, adopt the activity already running instead of restarting it |
+| `--update` | a single push to the running activity, rather than a start |
+| `--card-only` / `--no-card` | publish one surface without the other |
+| `--end` | end the activity now |
+| `--at HH:MM` | pretend it is this time of day |
+| `--now-is HH:MM` | slide the programme so this moment lands on the real clock |
+| `--offset HOURS` | shift the programme from its real date; `-24` rehearses day 1 a day early |
+| `--date YYYY-MM-DD` | hang the programme on a specific date (default: today) |
+| `--poll SECONDS` | how often `--watch` re-checks the schedule (default 20) |
+| `--speed N` | with `--at`, run the clock N times faster — for fast-forwarding a whole day |
 | `--dry-run` | print the payloads instead of sending them |
-| `--date 2026-09-23` | hang the programme on a specific date |
 
-`--date` defaults to today, and times are matched by time of day. So a
-rehearsal **tomorrow** with day 1's programme is just:
+### Rehearsing
+
+Times are matched by time of day, so running day 1's programme a day early is:
 
 ```sh
-./lisbonai_widget.py --day 1 --watch
+./lisbonai_widget.py --day 1 --offset -24 --watch
 ```
 
-at 09:00 on the 22nd, and it behaves exactly as it will on the 23rd.
+Use `--now-is` rather than `--at` for anything you intend to look at on the
+phone. The device ticks its countdown against its own clock, so a simulated
+14:40 on a schedule anchored to the 23rd shows a two-day countdown;
+`--now-is 14:40` slides the whole day so that moment is genuinely now.
 
-`--now-is` matters because the phone ticks its countdown against the real
-clock: a simulated 14:40 on a schedule anchored to the 23rd would show a
-two-day countdown. `--now-is` slides the whole day so the current moment is
-real.
+To swap this process onto new code mid-day, stop it and restart with
+`--resume`. Without it the first push is a `start`, and starting an activity
+that is already running restarts it — which the user sees as one banner
+dismissing and another animating in. `--resume` also reads the running
+activity's age from the API, so the restart guard below stays correct.
 
 ## Data
 
-- `schedule.json` — both days, hand-transcribed from
+- `schedule.json` — both days, transcribed from
   [lisbonai.org/schedule](https://lisbonai.org/schedule/).
-- `talks.json` — abstracts, scraped. Regenerate with `./fetch_talks.py`
-  whenever the site adds talks.
+- `talks.json` — abstracts, scraped from
+  [lisbonai.org/talks](https://lisbonai.org/talks/). Regenerate with
+  `./fetch_talks.py` whenever the site adds talks.
 
-The two are joined on speaker name (accent-insensitive), so a talk renamed on
-the site still matches.
+The two are joined on speaker name, accent-insensitively, so `Oguz Gultepe`
+matches `Oğuz Gültepe` and a talk retitled on the site still finds its slot.
 
-**Talk times are partly derived, and say so.** The site publishes times per
-*block* — "Agents, 2:30–4:30 PM, seven talks" — not per talk, so talks are
-spread evenly across their block.
+### Talk times are partly derived, and say so
 
-A time is written with a leading `~` wherever we worked it out rather than read
-it off the site:
+The site publishes times per *block* — "Agents, 2:30–4:30 PM, seven talks" —
+not per talk, so talks are spread evenly across their block. A time carries a
+leading `~` wherever we worked it out rather than read it off the site:
 
 | Time | Written | Because |
 | --- | --- | --- |
@@ -83,19 +108,57 @@ it off the site:
 | Everything else | `~10:15` | our even split |
 
 So `Agents · ~16:12–16:30` reads correctly: we guessed when that talk starts,
-and the site told us when the block ends. The Lock Screen countdown uses
-minute granularity, so iOS renders it as `~12 min` rather than a ticking clock
-that looks more certain than it is.
+and the site told us when the block ends. The countdown uses minute
+granularity, so iOS renders it as `~12 min` rather than a ticking clock that
+looks more certain than it is.
 
-If per-talk times are published later, give each talk a `start`/`end` in
-`schedule.json`; mark them exact there and the tildes disappear.
+If per-talk times are published later, give each talk its own `start`/`end` in
+`schedule.json` and mark them exact; the tildes disappear on their own.
 
-## Notes
+## Things learned the hard way
 
-- One activity per day, id `lisbonai-2026-day{N}`. Re-running without
-  `--update` *restarts* it, which the user sees as one banner dismissing and
-  another animating in — use `--update` for a routine push.
-- The card id is `lisbonai-now` and it is safe to leave published: outside
-  conference hours it becomes a countdown to the next day's doors.
-- Requests send an explicit `User-Agent`; the edge in front of the API refuses
-  urllib's default with a 403.
+Each of these is a constraint that is invisible until it bites, and each one
+shapes the code.
+
+**iOS ends a Live Activity after about 8 hours.** A conference day is eleven.
+`--watch` therefore restarts the activity once before the system kills it,
+preferring to do so during a break, since a restart costs a visible
+dismiss-and-reappear. Without this the Lock Screen goes dark mid-afternoon and
+nothing reports an error.
+
+**A Home Screen widget's reloads are rationed.** Roughly two an hour sustained
+with a burst of six, while the afternoon tracks change talk every ~17 minutes.
+The card is therefore published only when the talk actually changes, never on
+the heartbeat — with the heartbeat included the budget is gone by mid-
+afternoon and the card silently lags.
+
+**A card's briefing sections are capped at 500 characters** and real abstracts
+are routinely longer, so paragraphs are split on sentence boundaries rather
+than truncated. Sections are also revealed progressively by widget size: a
+medium widget draws only the first one, so the first section must be the blurb
+and not the title the card's headline already carries.
+
+**The Live Activity title is frozen at start**, along with `kind` and
+`deepLink`. So the title is `Lisbon AI · Day 1` and everything that moves lives
+in `value`, `items`, `progress` and `endsAt`. That is also why there is one
+activity id per day, `lisbonai-2026-day{N}`.
+
+**Every push carries `staleAt`.** If this process dies, the Lock Screen marks
+itself out of date instead of showing a talk that finished an hour ago. Going
+quiet is the one failure on this API that returns `200` to every call you did
+make.
+
+**The API edge refuses urllib's default User-Agent** with a `403` and
+Cloudflare error 1010, which says nothing about the cause. Requests send an
+explicit one.
+
+## Files
+
+| | |
+| --- | --- |
+| `lisbonai_widget.py` | the publisher — schedule → Live Activity + card |
+| `fetch_talks.py` | scrapes the talks page into `talks.json` |
+| `schedule.json` | the programme, both days |
+| `talks.json` | abstracts, generated |
+
+Schedule and talk content belong to [Lisbon AI](https://lisbonai.org).
