@@ -62,19 +62,36 @@ committed, which is why this repo can be public.
 
 ## Running it
 
-On each conference morning:
-
 ```sh
-./lisbonai_widget.py --day 1 --watch
+./lisbonai_widget.py --watch
 ```
 
-That starts the Live Activity, publishes the card, pushes a new state at every
-talk change plus a 10-minute heartbeat, and ends the activity when the day is
-over. Ctrl-C ends it cleanly too.
+`--day` is autodetected — whichever day is happening today, or the next one
+still to come — so that is the same command on both mornings, and it exits
+rather than replaying a day once the conference is over.
+
+It can be started the night before: the card goes up immediately and the Live
+Activity is held until 15 minutes before doors. After that it pushes a new
+state at every talk change plus a 10-minute heartbeat, restarts itself once at
+lunch (see below), and ends the activity when the day is done. Ctrl-C ends it
+cleanly too.
+
+To cover the whole conference with one unattended process:
+
+```sh
+nohup caffeinate -i sh -c \
+  './lisbonai_widget.py --day 1 --watch; ./lisbonai_widget.py --day 2 --watch' \
+  > conference.log 2>&1 &
+```
+
+Day 2 starts as day 1 finishes and holds until Thursday morning. `caffeinate`
+blocks idle sleep, but a closed lid still sleeps the machine; if that happens
+`staleAt` makes the Lock Screen mark itself out of date rather than show a talk
+that finished hours ago.
 
 | Flag | What it does |
 | --- | --- |
-| `--day N` | which conference day's programme to publish (default 1) |
+| `--day N` | which conference day to publish; autodetected if omitted |
 | `--watch` | run all day, pushing at every change |
 | `--resume` | with `--watch`, adopt the activity already running instead of restarting it |
 | `--update` | a single push to the running activity, rather than a start |

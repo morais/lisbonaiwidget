@@ -73,6 +73,22 @@ def load_abstracts():
     return {fold(t["speaker"]): t for t in json.loads(path.read_text())["talks"]}
 
 
+def pick_day(on=None):
+    """The conference day to publish: the one happening on `on` (default today),
+    else the next one still to come."""
+    days = sorted(json.loads((ROOT / "schedule.json").read_text())["days"],
+                  key=lambda d: d["date"])
+    on = on or datetime.now().date()
+    dated = [(datetime.strptime(d["date"], "%Y-%m-%d").date(), d["day"]) for d in days]
+    for when, number in dated:
+        if when == on:
+            return number
+    for when, number in dated:
+        if when > on:
+            return number
+    sys.exit(f"The conference finished on {dated[-1][0]}. Pass --day to replay one.")
+
+
 def day_date(day_number):
     """The day's own calendar date, as published."""
     data = json.loads((ROOT / "schedule.json").read_text())
@@ -475,7 +491,9 @@ def finish(env, day_number, dry_run, subtitle="Day wrapped — see you tomorrow"
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--day", type=int, default=1, help="which conference day's programme to show")
+    p.add_argument("--day", type=int, default=None,
+                   help="which conference day to publish; by default, the one happening "
+                        "today or the next one still to come")
     p.add_argument("--at", metavar="HH:MM", help="pretend it is this time of day")
     p.add_argument("--now-is", metavar="HH:MM", dest="now_is",
                    help="slide the whole programme so this moment lands on the real clock; "
@@ -501,6 +519,11 @@ def main():
     p.add_argument("--end", action="store_true", help="end the activity now")
     p.add_argument("--dry-run", action="store_true", help="print what would be pushed")
     args = p.parse_args()
+
+    if args.day is None:
+        on = datetime.strptime(args.date, "%Y-%m-%d").date() if args.date else None
+        args.day = pick_day(on)
+        print(f"day {args.day} selected automatically ({day_date(args.day)})")
 
     env = load_env()
     if args.end:
