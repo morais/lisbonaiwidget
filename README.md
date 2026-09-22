@@ -68,11 +68,27 @@ real.
 The two are joined on speaker name (accent-insensitive), so a talk renamed on
 the site still matches.
 
-**Talk times are estimates.** The site publishes times per *block* — "Agents,
-2:30–4:30 PM, seven talks" — not per talk, so talks are spread evenly across
-their block. The block boundaries, lunches and breaks are exact; a talk inside
-a block can be out by a few minutes. If per-talk times are published later,
-give each talk a `start`/`end` in `schedule.json` and the split goes away.
+**Talk times are partly derived, and say so.** The site publishes times per
+*block* — "Agents, 2:30–4:30 PM, seven talks" — not per talk, so talks are
+spread evenly across their block.
+
+A time is written with a leading `~` wherever we worked it out rather than read
+it off the site:
+
+| Time | Written | Because |
+| --- | --- | --- |
+| Breaks, lunch, doors, opening | `11:15` | published |
+| First talk of a block, its start | `09:45` | the block's own start |
+| Last talk of a block, its end | `16:30` | the block's own end |
+| Everything else | `~10:15` | our even split |
+
+So `Agents · ~16:12–16:30` reads correctly: we guessed when that talk starts,
+and the site told us when the block ends. The Lock Screen countdown uses
+minute granularity, so iOS renders it as `~12 min` rather than a ticking clock
+that looks more certain than it is.
+
+If per-talk times are published later, give each talk a `start`/`end` in
+`schedule.json`; mark them exact there and the tildes disappear.
 
 ## Notes
 

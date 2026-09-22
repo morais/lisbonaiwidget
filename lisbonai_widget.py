@@ -109,6 +109,8 @@ def build_timeline(day_number, anchor_date, offset=timedelta(0)):
                 "label": block["title"],
                 "sub": block.get("subtitle", ""),
                 "track": "",
+                "start_exact": True,
+                "end_exact": True,
             })
             continue
         talks = block["talks"]
@@ -122,6 +124,9 @@ def build_timeline(day_number, anchor_date, offset=timedelta(0)):
                 "sub": f"{talk['speaker']} · {talk['org']}",
                 "title": talk["title"],
                 "track": block["track"],
+                # only the block's own edges are published; the splits inside it are ours
+                "start_exact": i == 0,
+                "end_exact": i == len(talks) - 1,
             })
     abstracts = load_abstracts()
     for seg in segments:
@@ -152,14 +157,23 @@ def hhmm(dt):
     return dt.strftime("%H:%M")
 
 
+def starts(segment):
+    """A segment's start time, marked ~ when we derived it rather than read it."""
+    return ("" if segment["start_exact"] else "~") + hhmm(segment["start"])
+
+
+def ends(segment):
+    return ("" if segment["end_exact"] else "~") + hhmm(segment["end"])
+
+
 def row(segment, now, index):
     """One item row: what it is, who is giving it, when it starts."""
     running = segment["start"] <= now < segment["end"]
     item = {
         "id": f"slot-{index}",
         "title": segment["label"][:40],
-        "subtitle": segment["sub"] or f"{hhmm(segment['start'])}–{hhmm(segment['end'])}",
-        "value": "now" if running else hhmm(segment["start"]),
+        "subtitle": segment["sub"] or f"{starts(segment)}–{ends(segment)}",
+        "value": "now" if running else starts(segment),
         "status": "running" if running else "unknown",
     }
     if segment["kind"] == "talk":
@@ -194,7 +208,8 @@ def content_state(segments, now, next_push):
         state.update({
             "state": "Starts soon",
             "value": "Soon",
-            "subtitle": f"Doors {hhmm(day_start)} · first talk {hhmm(next(s for s in segments if s['kind'] == 'talk')['start'])}",
+            "subtitle": f"Doors {hhmm(day_start)} · first talk "
+                        f"{starts(next(s for s in segments if s['kind'] == 'talk'))}",
             "endsAt": iso(day_start),
             "signal": "neutral",
             "statusIcon": None,
@@ -231,7 +246,7 @@ def content_state(segments, now, next_push):
             "value": "Break",
             "subtitle": ellipsis(
                 (current["sub"] + " · " if current["sub"] else "")
-                + (f"Next: {nxt['label']} {hhmm(nxt['start'])}" if nxt else "Last session done"), 78),
+                + (f"Next: {nxt['label']} {starts(nxt)}" if nxt else "Last session done"), 78),
             "endsAt": iso(current["end"]),
             "signal": "neutral",
             "statusIcon": "cup.and.saucer",
@@ -294,11 +309,13 @@ def build_card(segments, now, day_number, next_push):
 
     if current and current["kind"] == "talk":
         detail = current.get("detail") or {}
-        sections = [{"id": "talk", "label": current["track"], "text": current["title"]}]
+        slot = f"{starts(current)}–{ends(current)}"
+        sections = [{"id": "talk", "label": f"{current['track']} · {slot}",
+                     "text": current["title"]}]
         for i, para in enumerate(paragraphs(detail.get("abstract", []))):
             sections.append({"id": f"abstract-{i}", "text": para})
         if nxt:
-            sections.append({"id": "next", "label": f"Next · {hhmm(nxt['start'])}",
+            sections.append({"id": "next", "label": f"Next · {starts(nxt)}",
                              "text": f"{nxt['label']}" + (f" — {nxt['sub']}" if nxt["kind"] == "talk" else "")})
         card.update({
             "value": current["label"],
@@ -317,13 +334,13 @@ def build_card(segments, now, day_number, next_push):
         sections = []
         if nxt and nxt["kind"] == "talk":
             detail = nxt.get("detail") or {}
-            sections.append({"id": "next", "label": f"Next · {hhmm(nxt['start'])}",
+            sections.append({"id": "next", "label": f"Next · {starts(nxt)}",
                              "text": f"{nxt['title']} — {nxt['sub']}"})
             for i, para in enumerate(paragraphs(detail.get("abstract", []))[:2]):
                 sections.append({"id": f"abstract-{i}", "text": para})
         card.update({
             "value": current["label"],
-            "subtitle": (f"Until {hhmm(current['end'])}" if not current["sub"] else current["sub"]),
+            "subtitle": (f"Until {ends(current)}" if not current["sub"] else current["sub"]),
             "status": "paused",
             "icon": "cup.and.saucer",
             "deadline": iso(current["end"]),
@@ -338,7 +355,7 @@ def build_card(segments, now, day_number, next_push):
     card.update({
         "value": (f"Day {day_number} · {day_start.strftime('%a %d %b')}" if before
                   else f"Day {day_number} wrapped"),
-        "subtitle": (f"Doors {hhmm(day_start)} · first talk {hhmm(first['start'])}" if before
+        "subtitle": (f"Doors {hhmm(day_start)} · first talk {starts(first)}" if before
                      else "See you tomorrow"),
         "status": "unknown" if before else "finished",
         "icon": "calendar",
