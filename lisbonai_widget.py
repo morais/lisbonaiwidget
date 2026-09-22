@@ -310,9 +310,10 @@ def build_card(segments, now, day_number, next_push):
     if current and current["kind"] == "talk":
         detail = current.get("detail") or {}
         slot = f"{starts(current)}–{ends(current)}"
-        sections = [{"id": "talk", "label": f"{current['track']} · {slot}",
-                     "text": current["title"]}]
-        for i, para in enumerate(paragraphs(detail.get("abstract", []))):
+        blurb = paragraphs(detail.get("abstract", [])) or [current["title"]]
+        sections = [{"id": "abstract-0", "label": f"{current['track']} · {slot}",
+                     "text": blurb[0]}]
+        for i, para in enumerate(blurb[1:6], start=1):
             sections.append({"id": f"abstract-{i}", "text": para})
         if nxt:
             sections.append({"id": "next", "label": f"Next · {starts(nxt)}",
@@ -326,7 +327,7 @@ def build_card(segments, now, day_number, next_push):
             "deadline": iso(current["end"]),
             "deepLink": detail.get("url", DEEP_LINK),
             "staleAfter": iso(current["end"] + timedelta(minutes=45)),
-            "briefing": {"sections": sections[:6]},
+            "briefing": {"sections": sections},
         })
         return card
 
@@ -395,6 +396,23 @@ def call(env, path, body, dry_run=False):
 
 def activity_id(day):
     return f"lisbonai-2026-day{day}"
+
+
+def started_at(env, day_number):
+    """When the running activity began, so a resumed watcher still knows how
+    close it is to the 8-hour ceiling. None if nothing is running."""
+    req = urllib.request.Request(
+        env["WIDGET_BASE_URL"].rstrip("/") + "/v1/live-activities",
+        headers={"Authorization": f"Bearer {env['WIDGET_TOKEN']}",
+                 "User-Agent": "lisbonai-widget/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            for a in json.loads(resp.read())["activities"]:
+                if a["externalActivityId"] == activity_id(day_number):
+                    return datetime.strptime(a["startedAt"][:19], "%Y-%m-%dT%H:%M:%S")
+    except (urllib.error.HTTPError, urllib.error.URLError, KeyError, ValueError):
+        pass
+    return None
 
 
 def publish(env, day_number, day, segments, now, started, dry_run, with_card=True):
@@ -467,6 +485,9 @@ def main():
                    help="publish only the Live Activity, leaving the Home Screen card alone")
     p.add_argument("--card-only", action="store_true", dest="card_only",
                    help="publish only the card (no Lock Screen banner)")
+    p.add_argument("--resume", action="store_true",
+                   help="with --watch, push to the activity already running instead of "
+                        "restarting it — for restarting this process mid-day")
     p.add_argument("--end", action="store_true", help="end the activity now")
     p.add_argument("--dry-run", action="store_true", help="print what would be pushed")
     args = p.parse_args()
@@ -503,14 +524,21 @@ def main():
         current, _ = where_are_we(segments, now)
         print(f"[{hhmm(now)}] card   · {current['label'] if current else '—'}")
         return
-    current, _ = publish(env, args.day, day, segments, now, started=args.update,
+    current, _ = publish(env, args.day, day, segments, now, started=args.update or args.resume,
                          dry_run=args.dry_run, with_card=not args.no_card)
 
     if not args.watch:
         return
 
     began = time.monotonic()
-    last_key, last_push, activity_began = key(current), now, time.monotonic()
+    activity_began = time.monotonic()
+    if args.resume:                       # the activity is older than this process
+        since = started_at(env, args.day)
+        if since:
+            age = (datetime.now(since.tzinfo or None) - since).total_seconds()
+            activity_began = time.monotonic() - max(age, 0) / max(args.speed, 1e-9)
+            print(f"resumed an activity already {age / 3600:.1f}h old")
+    last_key, last_push = key(current), now
     try:
         while True:
             time.sleep(args.poll)
