@@ -520,7 +520,8 @@ def main():
     p.add_argument("--dry-run", action="store_true", help="print what would be pushed")
     args = p.parse_args()
 
-    if args.day is None:
+    auto_day = args.day is None
+    if auto_day:
         on = datetime.strptime(args.date, "%Y-%m-%d").date() if args.date else None
         args.day = pick_day(on)
         print(f"day {args.day} selected automatically ({day_date(args.day)})")
@@ -529,12 +530,14 @@ def main():
     if args.end:
         return finish(env, args.day, args.dry_run, "Ended by hand")
 
-    if args.offset is not None and not args.date:
-        anchor = day_date(args.day)          # shift from the real date, not from today
-    elif args.date:
+    if args.date:
         anchor = datetime.strptime(args.date, "%Y-%m-%d").date()
+    elif args.offset is not None or auto_day:
+        # A day chosen by its own date belongs on that date. Anchoring it to
+        # today instead makes tomorrow's programme look like it already ended.
+        anchor = day_date(args.day)
     else:
-        anchor = datetime.now().date()
+        anchor = datetime.now().date()       # explicit --day: rehearse it today
     offset = timedelta(hours=args.offset) if args.offset is not None else timedelta(0)
     if args.now_is:
         h, m = (int(x) for x in args.now_is.split(":"))

@@ -100,7 +100,7 @@ that finished hours ago.
 | `--at HH:MM` | pretend it is this time of day |
 | `--now-is HH:MM` | slide the programme so this moment lands on the real clock |
 | `--offset HOURS` | shift the programme from its real date; `-24` rehearses day 1 a day early |
-| `--date YYYY-MM-DD` | hang the programme on a specific date (default: today) |
+| `--date YYYY-MM-DD` | hang the programme on a specific date (default: the chosen day's own date, or today when `--day` is given explicitly) |
 | `--poll SECONDS` | how often `--watch` re-checks the schedule (default 20) |
 | `--speed N` | with `--at`, run the clock N times faster — for fast-forwarding a whole day |
 | `--dry-run` | print the payloads instead of sending them |
