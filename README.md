@@ -27,6 +27,30 @@ day's doors, carrying the opening talk's blurb, so it is safe to leave up.
 The conference is **23–24 September 2026** at the Champalimaud Centre for the
 Unknown, Belém, Lisbon.
 
+## What 00Widget is
+
+[00Widget](https://00widget.com) is an iOS app plus an HTTP API for putting
+live state onto Apple surfaces — Home Screen widgets, Lock Screen Live
+Activities, the Dynamic Island, Apple Watch and Apple TV — without writing an
+app of your own. You install it, it registers push tokens for your devices,
+and anything that can POST JSON can then draw on them.
+
+You publish typed state rather than UI: no HTML, no layout, no colours. You
+pick a shape and fill it in, and the app decides how it renders on each
+surface. The two used here:
+
+- A **card** is standing state, something you check on — a balance, a queue
+  depth, tomorrow's first talk. It reaches Home Screen widgets on a rationed
+  refresh budget.
+- A **Live Activity** is work with a start and an end that you report on while
+  it runs — a build, a deploy, a conference day. It is the only surface that
+  reaches the Lock Screen and Dynamic Island, and updates are pushed straight
+  to the screen.
+
+This repo is one producer talking to that API: ~600 lines of Python, two JSON
+files, no dependencies. The API is `api.00widget.com`, authenticated with a
+publisher token from the app.
+
 ## Setup
 
 ```sh
@@ -120,11 +144,30 @@ If per-talk times are published later, give each talk its own `start`/`end` in
 Each of these is a constraint that is invisible until it bites, and each one
 shapes the code.
 
-**iOS ends a Live Activity after about 8 hours.** A conference day is eleven.
-`--watch` therefore restarts the activity once before the system kills it,
-preferring to do so during a break, since a restart costs a visible
-dismiss-and-reappear. Without this the Lock Screen goes dark mid-afternoon and
-nothing reports an error.
+**iOS ends a Live Activity after about 8 hours.** A conference day is eleven,
+so `--watch` restarts the activity once before the system kills it. The rule
+that survived contact with reality is *this activity cannot reach the end of
+the programme, and a fresh one started now could* — both halves matter. Without
+the second, it restarts on every poll of every break that is simply too early
+to help; a plain age threshold produced ten restarts in a simulated day. With
+both, it fires exactly once, during lunch, whatever time it was launched.
+
+A restart costs a visible dismiss-and-reappear, which is why it is aimed at a
+break rather than mid-talk.
+
+**The 8 hours start when the activity does, not when the day does.** So
+`--watch` can be launched the night before: it publishes the card immediately
+and holds the banner until 15 minutes before doors. Started at midnight, an
+activity spends its entire ceiling saying "starts soon" and is gone before
+anyone is on stage.
+
+**`time.monotonic()` stops while a Mac sleeps.** A clock built on it wakes up
+hours behind and then states the wrong talk with complete confidence. A real
+run reads the wall clock; only simulated ones are driven by elapsed time.
+
+**The API returns timestamps in UTC.** Parsing `startedAt` as local time
+overstated a resumed activity's age by the UTC offset, so the restart guard
+fired an hour early — visible only as a banner blinking at the wrong moment.
 
 **A Home Screen widget's reloads are rationed.** Roughly two an hour sustained
 with a burst of six, while the afternoon tracks change talk every ~17 minutes.
