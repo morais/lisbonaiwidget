@@ -530,14 +530,12 @@ def main():
     if args.end:
         return finish(env, args.day, args.dry_run, "Ended by hand")
 
-    if args.date:
-        anchor = datetime.strptime(args.date, "%Y-%m-%d").date()
-    elif args.offset is not None or auto_day:
-        # A day chosen by its own date belongs on that date. Anchoring it to
-        # today instead makes tomorrow's programme look like it already ended.
-        anchor = day_date(args.day)
-    else:
-        anchor = datetime.now().date()       # explicit --day: rehearse it today
+    # A conference day lives on its own date. Anchoring it to today instead
+    # makes any day but today's look like it already ended — which silently
+    # turns "day 1 then day 2" into "day 1 then a wrapped banner".
+    # --date and --offset are the ways to say otherwise.
+    anchor = (datetime.strptime(args.date, "%Y-%m-%d").date() if args.date
+              else day_date(args.day))
     offset = timedelta(hours=args.offset) if args.offset is not None else timedelta(0)
     if args.now_is:
         h, m = (int(x) for x in args.now_is.split(":"))

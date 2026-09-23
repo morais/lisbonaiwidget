@@ -80,9 +80,13 @@ To cover the whole conference with one unattended process:
 
 ```sh
 nohup caffeinate -i sh -c \
-  './lisbonai_widget.py --day 1 --watch; ./lisbonai_widget.py --day 2 --watch' \
+  'python3 -u lisbonai_widget.py --day 1 --watch; \
+   python3 -u lisbonai_widget.py --day 2 --watch' \
   > conference.log 2>&1 &
 ```
+
+`python3 -u` matters: writing to a file makes stdout block-buffered, and
+`conference.log` stays empty for hours while the run is perfectly healthy.
 
 Day 2 starts as day 1 finishes and holds until Thursday morning. `caffeinate`
 blocks idle sleep, but a closed lid still sleeps the machine; if that happens
@@ -100,7 +104,7 @@ that finished hours ago.
 | `--at HH:MM` | pretend it is this time of day |
 | `--now-is HH:MM` | slide the programme so this moment lands on the real clock |
 | `--offset HOURS` | shift the programme from its real date; `-24` rehearses day 1 a day early |
-| `--date YYYY-MM-DD` | hang the programme on a specific date (default: the chosen day's own date, or today when `--day` is given explicitly) |
+| `--date YYYY-MM-DD` | hang the programme on a specific date (default: that day's own date) |
 | `--poll SECONDS` | how often `--watch` re-checks the schedule (default 20) |
 | `--speed N` | with `--at`, run the clock N times faster — for fast-forwarding a whole day |
 | `--dry-run` | print the payloads instead of sending them |
